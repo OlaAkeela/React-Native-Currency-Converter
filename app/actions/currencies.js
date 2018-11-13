@@ -7,5 +7,5 @@ export const swapCurrencies = () => ({
 
 export const changeCurrencyAmount = amount => ({
   type: CHANGE_CURRENCY_AMOUNT,
-  amount,
+  amount: parseFloat(amount),
 });

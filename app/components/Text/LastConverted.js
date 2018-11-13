@@ -1,34 +1,34 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Text } from 'react-native';
-import PropTypes from 'prop-types';
+import moment from 'moment';
 
 import styles from './styles';
 
 const LastConverted = ({
-  base, quote, coverstionRate, date,
+  date, base, quote, conversionRate,
 }) => (
   <Text style={styles.smallText}>
-        1
+    1
     {' '}
     {base}
     {' '}
 =
     {' '}
-    {coverstionRate}
+    {conversionRate}
     {' '}
     {quote}
     {' '}
 as of
     {' '}
+    {moment(date).format('MMMM D, YYYY')}
   </Text>
 );
-
 LastConverted.propTypes = {
-
   base: PropTypes.string,
   quote: PropTypes.string,
   coverstionRate: PropTypes.number,
   date: PropTypes.object,
 };
 
-export default { LastConverted };
+export default LastConverted;
