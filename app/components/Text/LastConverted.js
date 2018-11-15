@@ -27,7 +27,7 @@ as of
 LastConverted.propTypes = {
   base: PropTypes.string,
   quote: PropTypes.string,
-  coverstionRate: PropTypes.number,
+  conversionRate: PropTypes.number,
   date: PropTypes.object,
 };
 

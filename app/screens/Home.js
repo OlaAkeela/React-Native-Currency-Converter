@@ -9,12 +9,8 @@ import { InputWithButton } from '../components/TextInput';
 import { ClearButton } from '../components/Button';
 import { LastConverted } from '../components/Text';
 import { Header } from '../components/Header';
-import { swapCurrencies, changeCurrencyAmount } from '../actions/currencies';
-
-const TEMP_BASE_PRICE = '100';
-const TEMP_QUOTE_PRICE = '79.74';
-const TEMP_CONVERSION_RATE = '0.7974';
-const TEMP_CONVERSION_DATE = new Date();
+import { connectAlert } from '../components/Alert';
+import { swapCurrencies, changeCurrencyAmount, getInitialConversion } from '../actions/currencies';
 
 class Home extends Component {
   static propTypes = {
@@ -22,18 +18,35 @@ class Home extends Component {
     dispatch: PropTypes.func,
     baseCurrency: PropTypes.string,
     quoteCurrency: PropTypes.string,
+    amount: PropTypes.number,
+    conversionRate: PropTypes.number,
+    isFetching: PropTypes.bool,
+    lastConvertedDate: PropTypes.object,
+    primaryColor: PropTypes.string,
+    alertWithType: PropTypes.func,
+    currencyError: PropTypes.string,
   };
 
+  componentWillMount() {
+    const { dispatch } = this.props;
+    dispatch(getInitialConversion());
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { currencyError, alertWithType } = this.props;
+    if (nextProps.currencyError && nextProps.currencyError !== currencyError) {
+      alertWithType('error', 'Error', nextProps.currencyError);
+    }
+  }
+
   handlePressBaseCurrency = () => {
-    console.log('press base');
     const { navigation } = this.props;
-    navigation.navigate('CurrencyList', { title: 'Base Currency' });
+    navigation.navigate('CurrencyList', { title: 'Base Currency', type: 'base' });
   };
 
   handlePressQouteCurrency = () => {
-    console.log('qoute base');
     const { navigation } = this.props;
-    navigation.navigate('CurrencyList', { title: 'Quote Currency' });
+    navigation.navigate('CurrencyList', { title: 'Quote Currency', type: 'quote' });
   };
 
   handleTextChange = (amount) => {
@@ -52,34 +65,49 @@ class Home extends Component {
   };
 
   render() {
-    const { baseCurrency, quoteCurrency } = this.props;
+    const {
+      baseCurrency,
+      quoteCurrency,
+      amount,
+      conversionRate,
+      isFetching,
+      lastConvertedDate,
+      primaryColor,
+    } = this.props;
+
+    let quotePrice = (amount * conversionRate).toFixed(2);
+    if (isFetching) {
+      quotePrice = '...';
+    }
 
     return (
-      <Container>
+      <Container backgroundColor={primaryColor}>
         <StatusBar translucent={false} barStyle="light-content" />
         <Header onPress={this.handleOptionPress} />
         <KeyboardAvoidingView behavior="padding">
-          <Logo />
+          <Logo tintColor={primaryColor} />
           <View />
           <InputWithButton
             buttonText={baseCurrency}
             onPress={this.handlePressBaseCurrency}
-            defaultVlaue={TEMP_BASE_PRICE}
+            defaultValue={amount.toString()}
             keyboardType="numeric"
             onChangeText={this.handleTextChange}
+            textColor={primaryColor}
           />
           <InputWithButton
             buttonText={quoteCurrency}
             onPress={this.handlePressQouteCurrency}
             editable={false}
-            defaultVlaue={TEMP_QUOTE_PRICE}
+            defaultValue={quotePrice}
+            textColor={primaryColor}
           />
           <ClearButton text="Reverse Currencies" onPress={this.handleSwapCurrency} />
           <LastConverted
             base={baseCurrency}
             quote={quoteCurrency}
-            conversionRate={TEMP_CONVERSION_RATE}
-            date={TEMP_CONVERSION_DATE}
+            conversionRate={conversionRate}
+            date={lastConvertedDate}
           />
         </KeyboardAvoidingView>
       </Container>
@@ -99,7 +127,9 @@ const mapStateToProps = (state) => {
     conversionRate: rates[quoteCurrency] || 0,
     lastConvertedDate: conversionSelector.date ? new Date(conversionSelector.date) : new Date(),
     isFetching: conversionSelector.isFetching,
+    primaryColor: state.theme.primaryColor,
+    currencyError: state.currencies.error,
   };
 };
 
-export default connect(mapStateToProps)(Home);
+export default connect(mapStateToProps)(connectAlert(Home));

@@ -3,13 +3,15 @@ import hoistNonReactStatic from 'hoist-non-react-statics';
 import PropTypes from 'prop-types';
 
 const connectAlert = (WrappedComponent) => {
+  // eslint-disable-next-line react/prefer-stateless-function
   class ConnectedAlert extends Component {
     render() {
+      const { alertWithType, alert } = this.context;
       return (
         <WrappedComponent
           {...this.props}
-          alertWithType={this.context.alertWithType}
-          alert={this.context.alert}
+          alertWithType={alertWithType}
+          alert={alert}
         />
       );
     }
