@@ -1,5 +1,4 @@
 # React Native currency converter app.
-======
 
 To try it, please install Expo app on your phone and go to exp://[exp.host/@olaakeela/CurrencyConverter]
 or you can clone this repo and run it in your environment: 
